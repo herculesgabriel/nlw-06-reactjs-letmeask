@@ -11,6 +11,8 @@ import { Question } from '../components/Question';
 
 import logoImg from '../assets/images/logo.svg';
 import deleteImg from '../assets/images/delete.svg';
+import checkImg from '../assets/images/check.svg';
+import answerImg from '../assets/images/answer.svg';
 
 import '../styles/room.scss';
 
@@ -31,6 +33,18 @@ export function AdminRoom() {
     });
 
     history.push('/');
+  }
+
+  async function handleCheckQuestionsAsAnswered(questionId: string) {
+    await firebaseDatabase.ref(`rooms/${roomId}/questions/${questionId}`).update({
+      isAnswered: true
+    });
+  }
+
+  async function handleHighlightedQuestion(questionId: string) {
+    await firebaseDatabase.ref(`rooms/${roomId}/questions/${questionId}`).update({
+      isHighlighted: true
+    });
   }
 
   async function handleDeleteQuestion(questionId: string) {
@@ -70,7 +84,30 @@ export function AdminRoom() {
 
         <div className="question-list">
           {questions.map(question => (
-            <Question key={question.id} {...question}>
+            <Question
+              key={question.id}
+              content={question.content}
+              author={question.author}
+              isAnswered={question.isAnswered}
+              isHighlighted={question.isHighlighted}
+            >
+              {!question.isAnswered && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleCheckQuestionsAsAnswered(question.id)}
+                  >
+                    <img src={checkImg} alt="Marcar pergunta como respondida" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleHighlightedQuestion(question.id)}
+                  >
+                    <img src={answerImg} alt="Dar destaque à pergunta" />
+                  </button>
+                </>
+              )}
+
               <button type="button" onClick={() => handleDeleteQuestion(question.id)}>
                 <img src={deleteImg} alt="Remover pergunta" />
               </button>
